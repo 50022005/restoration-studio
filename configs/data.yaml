@@ -1,0 +1,65 @@
+# configs/data.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+# Deadline: October 4 2026
+# Authoritative data configuration shared across Tasks 1-4.
+# ─────────────────────────────────────────────────────────────────────────────
+
+oxford_pets:
+  images_url: "https://www.robots.ox.ac.uk/~vgg/data/pets/data/images.tar.gz"
+  annotations_url: "https://www.robots.ox.ac.uk/~vgg/data/pets/data/annotations.tar.gz"
+  image_size: 128
+  channels: 3           # always RGB
+  train_ratio: 0.80
+  seed: 42
+  # Colab Drive paths (user-editable)
+  raw_dir:   "/content/drive/MyDrive/genai_assignment/data/pets_raw"
+  cache_dir: "/content/drive/MyDrive/genai_assignment/data/pets_cache"
+
+fs2k:
+  # Official source ONLY – no fallback.
+  # Clone from: https://github.com/DengPingFan/FS2K
+  # If the repo or dataset is unavailable, STOP and notify the user.
+  image_size: 128
+  channels: 3
+  val_ratio: 0.15       # of the official training split
+  seed: 42
+  raw_dir:   "/content/drive/MyDrive/genai_assignment/data/fs2k_raw"
+  cache_dir: "/content/drive/MyDrive/genai_assignment/data/fs2k_cache"
+
+corruption:
+  types: ["clean", "salt_pepper", "blur", "occlusion"]
+  train:
+    probabilities: [0.25, 0.25, 0.25, 0.25]   # equal probability
+    salt_pepper:
+      p_min: 0.02
+      p_max: 0.15
+    blur:
+      kernels: [3, 5, 7]
+      sigma_min: 0.5
+      sigma_max: 2.5
+    occlusion:
+      num_rects_min: 1
+      num_rects_max: 3
+      area_min: 0.10
+      area_max: 0.35
+
+  # Deterministic test severities (spec-mandated, do not change)
+  test_severities:
+    salt_pepper:         # p values
+      low:    0.03
+      medium: 0.08
+      high:   0.15
+    blur:                # [kernel_size, sigma]
+      low:    [3, 0.7]
+      medium: [5, 1.5]
+      high:   [7, 2.5]
+    occlusion:           # [num_rects, target_area_fraction]
+      low:    [1, 0.10]
+      medium: [2, 0.20]
+      high:   [3, 0.35]
+
+manifests:
+  val_manifest:  "data/manifests/val_manifest.json"
+  test_manifest: "data/manifests/test_manifest.json"
+  val_seed:  100
+  test_seed: 200

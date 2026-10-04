@@ -1,0 +1,57 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.env
+.venv/
+env/
+venv/
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Data ──────────────────────────────────────────────────────────────────────
+data/pets_raw/
+data/pets_cache/
+data/pets_cache_smoke/
+data/pets/
+data/fs2k/
+data/cache/
+
+# ── Models & Checkpoints ──────────────────────────────────────────────────────
+models/
+models_smoke/
+checkpoints/
+checkpoints_smoke/
+*.pt
+*.pth
+*.onnx
+
+# Optuna studies
+optuna/
+*.db
+
+# ── Experiment tracking ───────────────────────────────────────────────────────
+wandb/
+mlruns/
+
+# ── OS / IDE ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+.docker/
+
+# ── Secrets ───────────────────────────────────────────────────────────────────
+.env
+*.key
+*.token
+*.pem
