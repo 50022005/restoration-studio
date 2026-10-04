@@ -37,6 +37,8 @@ def _ssim_map(
 
     Both tensors should be in [0, 1] with shape (B, C, H, W).
     """
+    x = x.float()
+    y = y.float()
     B, C, H, W = x.shape
     k1d   = _gaussian_kernel_1d(window_size, sigma).to(device=x.device, dtype=x.dtype)
     k2d   = torch.outer(k1d, k1d)                                 # (w, w)
@@ -98,6 +100,8 @@ class ReconstructionLoss(nn.Module):
         x_hat: torch.Tensor,
         x: torch.Tensor,
     ) -> torch.Tensor:
+        x_hat = x_hat.float()
+        x = x.float()
         l1   = F.l1_loss(x_hat, x)
         ssim_val = ssim(x_hat, x)
         return self.alpha * l1 + (1.0 - self.alpha) * (1.0 - ssim_val)

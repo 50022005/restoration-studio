@@ -18,7 +18,10 @@ from typing import Callable, Dict, Optional, Tuple
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.cuda.amp import GradScaler, autocast
+try:
+    from torch.amp import GradScaler, autocast
+except ImportError:
+    from torch.cuda.amp import GradScaler, autocast
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
@@ -95,7 +98,7 @@ def run_epoch(
                 optimiser.zero_grad(set_to_none=True)
 
             if scaler is not None:
-                with autocast():
+                with autocast("cuda"):
                     outputs = model(inputs)
                     loss    = criterion(outputs, targets)
                 if training:

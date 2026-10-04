@@ -33,7 +33,10 @@ import yaml
 from optuna.pruners import MedianPruner
 from optuna.samplers import TPESampler
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-from torch.cuda.amp import GradScaler, autocast
+try:
+    from torch.amp import GradScaler, autocast
+except ImportError:
+    from torch.cuda.amp import GradScaler, autocast
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader
 
@@ -90,7 +93,7 @@ def train_clf_epoch(model, loader, optimiser, scaler, device, use_amp=True):
         optimiser.zero_grad(set_to_none=True)
 
         if use_amp and device.type == "cuda":
-            with autocast():
+            with autocast("cuda"):
                 logits = model(corrupted)
                 loss = criterion(logits, labels)
             scaler.scale(loss).backward()
@@ -122,7 +125,7 @@ def val_clf_epoch(model, loader, device, use_amp=True):
         for corrupted, _, labels in loader:
             corrupted, labels = corrupted.to(device), labels.to(device)
             if use_amp and device.type == "cuda":
-                with autocast():
+                with autocast("cuda"):
                     logits = model(corrupted)
             else:
                 logits = model(corrupted)
@@ -185,7 +188,7 @@ def main():
 
             model = CorruptionClassifier(base_channels, dropout).to(device)
             optimiser = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
-            scaler = GradScaler() if clf_cfg.get("training", {}).get("amp", True) and device.type == "cuda" else None
+            scaler = GradScaler("cuda") if clf_cfg.get("training", {}).get("amp", True) and device.type == "cuda" else None
 
             train_ds = PetDataset(train_npy, deterministic=True, seed=0)
             sample_labels = [train_ds[i][2] for i in range(len(train_ds))]
@@ -228,7 +231,7 @@ def main():
     model = CorruptionClassifier(base_channels, dropout).to(device)
     optimiser = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     scheduler = CosineAnnealingLR(optimiser, T_max=max_epochs)
-    scaler = GradScaler() if clf_cfg.get("training", {}).get("amp", True) and device.type == "cuda" else None
+    scaler = GradScaler("cuda") if clf_cfg.get("training", {}).get("amp", True) and device.type == "cuda" else None
 
     ckpt_dir = clf_cfg.get("training", {}).get("checkpoint_dir", "checkpoints/task2_clf")
     if args.smoke:

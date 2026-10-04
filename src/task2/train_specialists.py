@@ -26,7 +26,10 @@ import torch
 import yaml
 from optuna.pruners import MedianPruner
 from optuna.samplers import TPESampler
-from torch.cuda.amp import GradScaler, autocast
+try:
+    from torch.amp import GradScaler, autocast
+except ImportError:
+    from torch.cuda.amp import GradScaler, autocast
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader, Dataset
 
@@ -103,7 +106,7 @@ def train_one_epoch(model, loader, criterion, optimiser, scaler, device, use_amp
         corrupted, clean = corrupted.to(device), clean.to(device)
         optimiser.zero_grad(set_to_none=True)
         if use_amp and device.type == "cuda":
-            with autocast():
+            with autocast("cuda"):
                 out = model(corrupted)
                 loss = criterion(out, clean)
             scaler.scale(loss).backward()
@@ -129,7 +132,7 @@ def val_one_epoch(model, loader, criterion, device, use_amp=True):
         for corrupted, clean, _ in loader:
             corrupted, clean = corrupted.to(device), clean.to(device)
             if use_amp and device.type == "cuda":
-                with autocast():
+                with autocast("cuda"):
                     out = model(corrupted)
                     loss = criterion(out, clean)
             else:
@@ -208,7 +211,7 @@ def main():
             model = UniversalAE(base_channels, bottleneck_dim, 0.0).to(device)
             criterion = ReconstructionLoss(alpha)
             optimiser = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
-            scaler = GradScaler() if spec_cfg.get("training", {}).get("amp", True) and device.type == "cuda" else None
+            scaler = GradScaler("cuda") if spec_cfg.get("training", {}).get("amp", True) and device.type == "cuda" else None
 
             ds = SpecSearchDataset(train_npy)
             ld = DataLoader(ds, batch_size=batch_size, shuffle=True, drop_last=True)
@@ -260,7 +263,7 @@ def main():
         criterion = ReconstructionLoss(best_spec.get("alpha", 0.8))
         optimiser = torch.optim.AdamW(model.parameters(), lr=best_spec.get("lr", 1e-3), weight_decay=1e-4)
         scheduler = CosineAnnealingLR(optimiser, T_max=max_epochs)
-        scaler = GradScaler() if spec_cfg.get("training", {}).get("amp", True) and device.type == "cuda" else None
+        scaler = GradScaler("cuda") if spec_cfg.get("training", {}).get("amp", True) and device.type == "cuda" else None
 
         model, optimiser, start_epoch, prev_metrics = load_checkpoint(model, ckpt_dir, optimiser=optimiser, device=device)
         best_ssim = prev_metrics.get("val_ssim", 0.0)

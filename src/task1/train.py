@@ -28,7 +28,10 @@ import torch
 import yaml
 from optuna.pruners import MedianPruner
 from optuna.samplers import TPESampler
-from torch.cuda.amp import GradScaler, autocast
+try:
+    from torch.amp import GradScaler, autocast
+except ImportError:
+    from torch.cuda.amp import GradScaler, autocast
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader
 
@@ -122,7 +125,7 @@ def train_one_epoch(model, loader, criterion, optimiser, scaler, device, use_amp
         corrupted, clean = corrupted.to(device), clean.to(device)
         optimiser.zero_grad(set_to_none=True)
         if use_amp and device.type == "cuda":
-            with autocast():
+            with autocast("cuda"):
                 out = model(corrupted)
                 loss = criterion(out, clean)
             scaler.scale(loss).backward()
@@ -148,7 +151,7 @@ def val_one_epoch(model, loader, criterion, device, use_amp=True):
         for corrupted, clean, _ in loader:
             corrupted, clean = corrupted.to(device), clean.to(device)
             if use_amp and device.type == "cuda":
-                with autocast():
+                with autocast("cuda"):
                     out = model(corrupted)
                     loss = criterion(out, clean)
             else:
@@ -219,7 +222,7 @@ def main():
             model = UniversalAE(base_channels, bottleneck_dim, dropout).to(device)
             criterion = ReconstructionLoss(alpha)
             optimiser = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
-            scaler = GradScaler() if config.get("training", {}).get("amp", True) and device.type == "cuda" else None
+            scaler = GradScaler("cuda") if config.get("training", {}).get("amp", True) and device.type == "cuda" else None
 
             train_ds = PetDataset(train_npy)
             val_ds = PetDataset(val_npy, manifest=val_manifest)
@@ -271,7 +274,7 @@ def main():
         weight_decay=config.get("training", {}).get("weight_decay", 1e-4),
     )
     scheduler = CosineAnnealingLR(optimiser, T_max=max_epochs)
-    scaler = GradScaler() if config.get("training", {}).get("amp", True) and device.type == "cuda" else None
+    scaler = GradScaler("cuda") if config.get("training", {}).get("amp", True) and device.type == "cuda" else None
 
     ckpt_dir = config.get("training", {}).get("checkpoint_dir", "checkpoints/task1")
     if args.smoke:
