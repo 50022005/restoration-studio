@@ -23,7 +23,7 @@ data/pets_cache_smoke/
 data/pets/
 data/fs2k/
 data/cache/
-
+docs/
 # ── Models & Checkpoints ──────────────────────────────────────────────────────
 models/
 models_smoke/
