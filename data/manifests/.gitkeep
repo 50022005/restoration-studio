@@ -1,0 +1,5 @@
+# data/manifests/.gitkeep
+# This directory stores the deterministic corruption manifests.
+# Manifests are generated ONCE by data/prepare_pets.py and committed to git.
+# The actual .json files (potentially large) may be stored on Drive;
+# include download links in README.

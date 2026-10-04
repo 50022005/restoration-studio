@@ -1,0 +1,25 @@
+{
+  "seed": 42,
+  "train": [
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\train_0.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\train_1.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\train_2.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\train_3.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\train_4.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\train_5.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\train_6.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\train_7.npy"
+  ],
+  "val": [
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\val_0.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\val_1.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\val_2.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\val_3.npy"
+  ],
+  "test": [
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\val_0.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\val_1.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\val_2.npy",
+    "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\val_3.npy"
+  ]
+}

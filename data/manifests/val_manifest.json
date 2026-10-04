@@ -1,0 +1,36 @@
+[
+  {
+    "index": 0,
+    "image_path": "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\val_0.npy",
+    "corruption_type": "blur",
+    "severity": {
+      "kernel_size": 5,
+      "sigma": 2.0335365241029653
+    },
+    "seed": 1646872012
+  },
+  {
+    "index": 1,
+    "image_path": "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\val_1.npy",
+    "corruption_type": "blur",
+    "severity": {
+      "kernel_size": 7,
+      "sigma": 2.012164443870134
+    },
+    "seed": 1793109397
+  },
+  {
+    "index": 2,
+    "image_path": "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\val_2.npy",
+    "corruption_type": "clean",
+    "severity": {},
+    "seed": 266670594
+  },
+  {
+    "index": 3,
+    "image_path": "D:\\work\\GenAi\\Genai\\data\\pets_cache_smoke\\val_3.npy",
+    "corruption_type": "clean",
+    "severity": {},
+    "seed": 1281090018
+  }
+]
