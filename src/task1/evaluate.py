@@ -48,6 +48,24 @@ from src.utils.losses import ssim
 from src.utils.training import load_checkpoint, set_seeds
 
 
+def resolve_img_path(raw_path: str) -> Path:
+    p = Path(raw_path.replace(".jpg", ".npy").replace(".png", ".npy"))
+    if p.exists():
+        return p
+    fname = p.name
+    for c_dir in [
+        Path("/content/drive/MyDrive/genai_assignment/data/pets_cache/test"),
+        Path("/content/drive/MyDrive/genai_assignment/data/pets_cache/val"),
+        Path("/content/drive/MyDrive/genai_assignment/data/pets_cache/train"),
+        Path("data/pets_cache/test"),
+        Path("data/pets_cache/val"),
+        Path("data/pets_cache/train"),
+    ]:
+        if (c_dir / fname).exists():
+            return c_dir / fname
+    return p
+
+
 def tensor_to_np(t: torch.Tensor) -> np.ndarray:
     return (t.squeeze().permute(1, 2, 0).cpu().float().clamp(0, 1).numpy() * 255).astype(np.uint8)
 
@@ -67,11 +85,11 @@ def plot_visual_grid(model, manifest, n=12, title="Reconstruction Grid", device=
 
     for row, idx in enumerate(idxs):
         rec = manifest[idx]
-        img_path = rec["image_path"]
-        if not Path(img_path).exists():
+        img_p = resolve_img_path(rec["image_path"])
+        if not img_p.exists():
             clean_np = np.zeros((128, 128, 3), dtype=np.uint8)
         else:
-            clean_np = np.load(img_path)
+            clean_np = np.load(str(img_p))
         corr_np = corrupt_from_record(clean_np, rec)
 
         clean_t = torch.from_numpy(clean_np).permute(2, 0, 1).float().unsqueeze(0) / 255.0
@@ -159,11 +177,11 @@ def main():
     print(f"[>] Evaluating {len(test_manifest)} records on {device}...")
     with torch.no_grad():
         for rec in test_manifest:
-            img_path = rec["image_path"]
-            if not Path(img_path).exists():
+            img_p = resolve_img_path(rec["image_path"])
+            if not img_p.exists():
                 clean_np = np.zeros((128, 128, 3), dtype=np.uint8)
             else:
-                clean_np = np.load(img_path)
+                clean_np = np.load(str(img_p))
             corr_np = corrupt_from_record(clean_np, rec)
 
             clean_t = torch.from_numpy(clean_np).permute(2, 0, 1).float().unsqueeze(0).to(device) / 255.0
@@ -205,8 +223,8 @@ def main():
     failure_records = []
     for rec in test_manifest:
         if rec["corruption_type"] != "clean":
-            img_path = rec["image_path"]
-            clean_np = np.zeros((128, 128, 3), dtype=np.uint8) if not Path(img_path).exists() else np.load(img_path)
+            img_p = resolve_img_path(rec["image_path"])
+            clean_np = np.zeros((128, 128, 3), dtype=np.uint8) if not img_p.exists() else np.load(str(img_p))
             corr_np = corrupt_from_record(clean_np, rec)
             clean_t = torch.from_numpy(clean_np).permute(2, 0, 1).float().unsqueeze(0).to(device) / 255.0
             corr_t = torch.from_numpy(corr_np).permute(2, 0, 1).float().unsqueeze(0).to(device) / 255.0

@@ -44,6 +44,24 @@ from src.utils.losses import ssim
 from src.utils.training import load_checkpoint, set_seeds
 
 
+def resolve_img_path(raw_path: str) -> Path:
+    p = Path(raw_path.replace(".jpg", ".npy").replace(".png", ".npy"))
+    if p.exists():
+        return p
+    fname = p.name
+    for c_dir in [
+        Path("/content/drive/MyDrive/genai_assignment/data/pets_cache/test"),
+        Path("/content/drive/MyDrive/genai_assignment/data/pets_cache/val"),
+        Path("/content/drive/MyDrive/genai_assignment/data/pets_cache/train"),
+        Path("data/pets_cache/test"),
+        Path("data/pets_cache/val"),
+        Path("data/pets_cache/train"),
+    ]:
+        if (c_dir / fname).exists():
+            return c_dir / fname
+    return p
+
+
 def hard_route_infer(corrupted_t, model_clf, model_salt, model_blur, model_occ, routing_label=None):
     with torch.no_grad():
         probs = model_clf.predict_proba(corrupted_t)
@@ -161,11 +179,11 @@ def main():
     print(f"[>] Evaluating Hard Routing on {len(eval_manifest)} test records...")
 
     for rec in eval_manifest:
-        img_path = rec["image_path"]
-        if not Path(img_path).exists():
+        img_p = resolve_img_path(rec["image_path"])
+        if not img_p.exists():
             clean_np = np.zeros((128, 128, 3), dtype=np.uint8)
         else:
-            clean_np = np.load(img_path)
+            clean_np = np.load(str(img_p))
         corr_np = corrupt_from_record(clean_np, rec)
 
         clean_t = torch.from_numpy(clean_np).permute(2, 0, 1).float().unsqueeze(0).to(device) / 255.0

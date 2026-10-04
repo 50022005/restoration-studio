@@ -23,9 +23,15 @@ import hashlib
 import json
 import os
 import sys
+from pathlib import Path
+
+# Add repo root to sys.path so 'src' can be imported when running script directly
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 import tarfile
 import urllib.request
-from pathlib import Path
 from typing import List, Tuple
 
 import numpy as np

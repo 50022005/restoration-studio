@@ -95,8 +95,29 @@ class PetDataset(Dataset):
             label  = LABEL_TO_IDX[corruption]
         else:
             record     = self._records[idx]
-            img        = np.load(record["image_path"].replace(
-                ".jpg", ".npy").replace(".png", ".npy"))    # cached .npy
+            raw_path   = record["image_path"].replace(".jpg", ".npy").replace(".png", ".npy")
+            img_path   = Path(raw_path)
+            if not img_path.exists():
+                fname = img_path.name
+                found = False
+                if self.cache_paths:
+                    candidate = Path(self.cache_paths[0]).parent / fname
+                    if candidate.exists():
+                        img_path = candidate
+                        found = True
+                if not found:
+                    for c_dir in [
+                        Path("/content/drive/MyDrive/genai_assignment/data/pets_cache/val"),
+                        Path("/content/drive/MyDrive/genai_assignment/data/pets_cache/test"),
+                        Path("/content/drive/MyDrive/genai_assignment/data/pets_cache/train"),
+                        Path("data/pets_cache/val"),
+                        Path("data/pets_cache/test"),
+                        Path("data/pets_cache/train"),
+                    ]:
+                        if (c_dir / fname).exists():
+                            img_path = c_dir / fname
+                            break
+            img        = np.load(str(img_path))
             corrupted  = corrupt_from_record(img, record)
             label      = LABEL_TO_IDX[record["corruption_type"]]
 
