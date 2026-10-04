@@ -38,7 +38,7 @@ def _ssim_map(
     Both tensors should be in [0, 1] with shape (B, C, H, W).
     """
     B, C, H, W = x.shape
-    k1d   = _gaussian_kernel_1d(window_size, sigma).to(x.device)
+    k1d   = _gaussian_kernel_1d(window_size, sigma).to(device=x.device, dtype=x.dtype)
     k2d   = torch.outer(k1d, k1d)                                 # (w, w)
     kernel = k2d.unsqueeze(0).unsqueeze(0).repeat(C, 1, 1, 1)    # (C,1,w,w)
     pad   = window_size // 2
