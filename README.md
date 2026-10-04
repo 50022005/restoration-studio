@@ -1,7 +1,5 @@
 # Generative AI Image Restoration & Synthesis System 
 
-This repository contains the complete implementation for **Milestone 1: Foundations, Task 1 (Universal Restoration), and Task 2 (Hard-Routed Restoration)** for the Oxford-IIIT Pet dataset.
-
 ---
 
 ## 📁 Repository Structure
